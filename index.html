@@ -1,1 +1,137 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Check-in Maison</title>
+<meta name="theme-color" content="#0c0b0a"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0c0b0a;--bg2:#141210;--bg3:#1c1916;--border:#2a2622;--text:#e8e2d9;--muted:#9a9187;--dim:#6b645c;--accent:#c4a882;--accent-dim:#8a7355;--serif:Georgia,serif;--font:system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;max-width:480px;margin:0 auto;padding:0 0 80px}
+button,input,textarea{font:inherit;color:inherit;background:transparent;border:none;outline:none}button{cursor:pointer}
+.top{position:sticky;top:0;z-index:20;background:rgba(12,11,10,.94);border-bottom:1px solid var(--border);padding:14px 16px 10px}
+.brand{font-family:var(--serif);font-size:1.15rem;color:var(--accent)}.brand span{display:block;font-size:.72rem;color:var(--dim);letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
+.cadre{margin-top:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;font-size:.8rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px}
+.tag{padding:2px 8px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);font-size:.75rem;color:var(--text)}.tag.on{border-color:var(--accent-dim);color:var(--accent)}
+.nav{display:flex;gap:4px;margin-top:12px;overflow-x:auto}.nav button{flex:0 0 auto;padding:7px 12px;border-radius:999px;font-size:.78rem;color:var(--muted)}.nav button.active{color:var(--text);background:var(--bg3);border:1px solid var(--border)}
+main{padding:16px}.panel{display:none}.panel.active{display:block}
+h2{font-family:var(--serif);font-size:1.05rem;font-weight:500;color:var(--accent);margin-bottom:12px}
+h3{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);margin:16px 0 8px}
+label{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--dim);margin-bottom:6px}
+.field{margin-bottom:12px}
+.input,.textarea{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 12px}
+.textarea{min-height:68px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chip{padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--bg2);font-size:.75rem;color:var(--muted)}.chip.active{border-color:var(--accent-dim);color:var(--accent)}
+.slider{display:flex;align-items:center;gap:12px}.slider input{flex:1;accent-color:var(--accent)}.sat{font-family:var(--serif);font-size:1.2rem;color:var(--accent);min-width:28px;text-align:center}
+.btn{width:100%;padding:13px;border-radius:10px;background:var(--accent);color:#1a1510;font-weight:600;margin-top:8px}.btn:disabled{opacity:.5}
+.btn.sec{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn.ghost{width:auto;padding:8px 12px;background:transparent;border:1px solid var(--border);color:var(--accent);font-size:.8rem;font-weight:500}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.meta{display:flex;justify-content:space-between;margin-bottom:8px}.date{font-family:var(--serif);color:var(--accent)}.sat2{font-size:.78rem;color:var(--muted)}
+.line{font-size:.85rem;color:var(--muted);margin-top:4px}.line strong{color:var(--text);font-weight:500}
+.detail{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}.card.expanded .detail{display:block}
+.empty{color:var(--dim);text-align:center;padding:24px 8px;font-size:.9rem}
+.hint{font-size:.78rem;color:var(--dim);margin-bottom:10px}
+.ci{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px}.ci .t{color:var(--text);font-size:.9rem;margin-bottom:4px}.ci .b{color:var(--muted);font-size:.82rem}
+.sl{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent-dim);margin:16px 0 8px}
+.dec{border-left:2px solid var(--accent-dim);padding:8px 0 8px 12px;margin-bottom:12px}.dec .dd{font-size:.72rem;color:var(--dim)}.dec .dt{color:var(--text);font-size:.9rem;margin-top:2px}.dec .db{color:var(--muted);font-size:.82rem;margin-top:4px}
+details{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-top:12px}summary{cursor:pointer;color:var(--muted);font-size:.8rem;list-style:none}
+.toggle{display:flex;align-items:center;gap:10px;margin:10px 0;font-size:.85rem;color:var(--muted)}.toggle input{width:18px;height:18px;accent-color:var(--accent)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border);padding:10px 16px;border-radius:10px;font-size:.85rem;opacity:0;transition:opacity .2s;z-index:50}.toast.show{opacity:1}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+</style>
+</head>
+<body>
+<header class="top">
+<div class="brand">Check-in Maison<span>rituel quotidien</span></div>
+<div class="cadre" id="cadreBanner">
+<span class="tag" id="tagDenial">Déni · —</span>
+<span class="tag" id="tagNeed">Besoin · —</span>
+<span class="tag" id="tagFocus" style="display:none"></span>
+</div>
+<nav class="nav" id="nav">
+<button data-p="checkin" class="active">Check-in</button>
+<button data-p="history">Historique</button>
+<button data-p="contrat">Contrat</button>
+<button data-p="decisions">Décisions</button>
+<button data-p="revue">Revue</button>
+<button data-p="partage">Partage</button>
+</nav>
+</header>
+<main>
+<section class="panel active" id="p-checkin">
+<h2>Aujourd'hui</h2>
+<p class="hint" id="todayLabel"></p>
+<form id="form">
+<div class="field"><label>État corporel</label><input class="input" name="body" placeholder="Tension, fatigue…"/></div>
+<div class="field"><label>État mental / AuDHD</label><input class="input" name="mental" placeholder="Dispersion, surcharge…"/></div>
+<div class="field"><label>Saturation</label><div class="slider"><input type="range" name="saturation" min="1" max="10" value="5"/><span class="sat" id="satVal">5</span></div></div>
+<div class="field"><label>Observation précise</label><textarea class="textarea" name="observation" placeholder="Un fait net"></textarea></div>
+<div class="field"><label>Désirs / frustrations</label>
+<div class="chips" id="desireChips">
+<button type="button" class="chip" data-t="J'ai du mal à demander… ">demander</button>
+<button type="button" class="chip" data-t="Ce que je n'ose pas dire c'est… ">n'ose pas</button>
+<button type="button" class="chip" data-t="J'ai peur que tu prennes ça pour… ">peur que</button>
+<button type="button" class="chip" data-t="J'ai besoin que tu décides de… ">décide</button>
+<button type="button" class="chip" data-t="Tiraillement entre… ">tiraillement</button>
+</div>
+<textarea class="textarea" name="desires" placeholder="Ou le noyau brut, même flou"></textarea></div>
+<div class="field"><label>Besoin du moment</label>
+<div class="chips" id="needChips">
+<button type="button" class="chip" data-n="tenir">tenir</button>
+<button type="button" class="chip" data-n="ordre">ordre</button>
+<button type="button" class="chip" data-n="silence">silence</button>
+<button type="button" class="chip" data-n="structure">structure</button>
+<button type="button" class="chip" data-n="présence">présence</button>
+<button type="button" class="chip" data-n="espace">espace</button>
+<button type="button" class="chip" data-n="douceur">douceur</button>
+</div>
+<input class="input" name="need" placeholder="tenir, ordre, silence…"/></div>
+<div class="field"><label>Ce que tu n'as pas dit (optionnel)</label><textarea class="textarea" name="unsaid" placeholder="Un filet" style="min-height:52px"></textarea></div>
+<button class="btn" id="saveBtn" type="submit">Enregistrer</button>
+</form>
+</section>
+<section class="panel" id="p-history"><h2>Historique</h2><div id="historyList" class="empty">Chargement…</div></section>
+<section class="panel" id="p-contrat"><h2>Contrat vivant</h2><p class="hint">Socle du 12 août 2026. Évolutif.</p><div id="contractList">Chargement…</div>
+<details><summary>+ Proposer une modification</summary>
+<div class="field" style="margin-top:12px"><label>Titre</label><input class="input" id="propTitle"/></div>
+<div class="field"><label>Détail</label><textarea class="textarea" id="propBody"></textarea></div>
+<button type="button" class="btn sec" id="propBtn">Mettre en discussion</button>
+</details></section>
+<section class="panel" id="p-decisions"><h2>Journal des décisions</h2><p class="hint">1–2 lignes quand quelque chose d'important est tranché.</p><div id="decisionList">Chargement…</div>
+<details><summary>+ Ajouter une décision</summary>
+<div class="field" style="margin-top:12px"><label>Titre</label><input class="input" id="decTitle"/></div>
+<div class="field"><label>Note</label><textarea class="textarea" id="decBody" style="min-height:52px"></textarea></div>
+<button type="button" class="btn sec" id="decBtn">Enregistrer</button>
+</details>
+<h3>Cadre du moment</h3>
+<div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px">
+<div class="toggle"><input type="checkbox" id="cadreDenial"/><span>Déni actif</span></div>
+<div class="field"><label>Note déni</label><input class="input" id="cadreDenialNote" placeholder="Jusqu'à nouvel ordre…"/></div>
+<div class="field"><label>Besoin dominant</label><input class="input" id="cadreNeed"/></div>
+<div class="field"><label>Ordre / focus du jour</label><input class="input" id="cadreFocus"/></div>
+<button type="button" class="btn sec" id="cadreSave">Mettre à jour le cadre</button>
+</div></section>
+<section class="panel" id="p-revue"><h2>Revue hebdomadaire</h2><p class="hint">Trois questions. Pas un questionnaire.</p>
+<form id="reviewForm">
+<div class="field"><label>Qu'est-ce qui a tenu ?</label><textarea class="textarea" name="held"></textarea></div>
+<div class="field"><label>Qu'est-ce qui a frotté / manqué ?</label><textarea class="textarea" name="friction"></textarea></div>
+<div class="field"><label>Une envie pour la suite</label><textarea class="textarea" name="desire"></textarea></div>
+<button class="btn" type="submit">Enregistrer la revue</button>
+</form>
+<h3>Dernières revues</h3><div id="reviewList" class="empty">Aucune encore.</div></section>
+<section class="panel" id="p-partage"><h2>Partage</h2><p class="hint">Lien lecture seule. L'autre voit, ne modifie pas.</p>
+<div class="card">
+<div class="line"><strong>Token</strong> · feu-calme-cbb7</div>
+<div class="line" style="margin-top:8px;word-break:break-all" id="shareUrl"></div>
+<div class="row">
+<button type="button" class="btn ghost" id="copyLink">Copier le lien</button>
+<button type="button" class="btn ghost" id="copyText">Copier le dernier check-in</button>
+</div></div></section>
+</main>
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
