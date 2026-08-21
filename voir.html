@@ -1,102 +1,78 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Check-in Maison · lecture seule</title>
-  <meta name="theme-color" content="#0c0b0a" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --bg: #0c0b0a; --bg2: #141210; --border: #2a2622;
-      --text: #e8e2d9; --muted: #9a9187; --dim: #6b645c;
-      --accent: #c4a882; --accent-dim: #8a7355;
-      --serif: Georgia, "Times New Roman", serif;
-      --font: "Segoe UI", system-ui, sans-serif;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg); color: var(--text);
-      font-family: var(--font); font-size: 15px; line-height: 1.5;
-      max-width: 480px; margin: 0 auto; padding: 20px 16px 48px;
-    }
-    h1 {
-      font-family: var(--serif); font-size: 1.2rem; color: var(--accent);
-      font-weight: 500;
-    }
-    .sub { color: var(--dim); font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; margin-bottom: 20px; }
-    .card {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: 12px; padding: 14px; margin-bottom: 10px;
-    }
-    .meta { display: flex; justify-content: space-between; margin-bottom: 8px; }
-    .date { font-family: var(--serif); color: var(--accent); }
-    .sat { color: var(--muted); font-size: .8rem; }
-    .line { font-size: .85rem; color: var(--muted); margin-top: 4px; }
-    .line strong { color: var(--text); font-weight: 500; }
-    .empty { color: var(--dim); text-align: center; padding: 32px 8px; }
-    .err { color: #b86a5a; text-align: center; padding: 32px 8px; }
-    a { color: var(--accent); }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Check-in Maison · lecture seule</title>
+<meta name="theme-color" content="#0c0b0a"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0c0b0a;--bg2:#141210;--border:#2a2622;--text:#e8e2d9;--muted:#9a9187;--dim:#6b645c;--accent:#c4a882;--serif:Georgia,serif;--font:system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;max-width:480px;margin:0 auto;padding:20px 16px 48px}
+h1{font-family:var(--serif);font-size:1.2rem;color:var(--accent);font-weight:500}
+.sub{color:var(--dim);font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;margin:4px 0 20px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.meta{display:flex;justify-content:space-between;margin-bottom:8px}
+.date{font-family:var(--serif);color:var(--accent)}
+.sat{color:var(--muted);font-size:.8rem}
+.line{font-size:.85rem;color:var(--muted);margin-top:4px}
+.line strong{color:var(--text);font-weight:500}
+.empty{color:var(--dim);text-align:center;padding:32px 8px}
+.err{color:#b86a5a;text-align:center;padding:32px 8px}
+</style>
 </head>
 <body>
-  <h1>Check-in Maison</h1>
-  <p class="sub">Lecture seule</p>
-  <div id="root" class="empty">Chargement…</div>
-
-  <script>
-    const SUPABASE_URL = "https://itotjwvqhvdfmluzrjkd.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0b3Rqd3ZxaHZkZm1sdXpyamtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwNTUwNTYsImV4cCI6MjEwMjYzMTA1Nn0.qSO_uBExBpo3Yt93Ps6bAcdfrTZJpi56RSIgQrETEGw";
-    const VALID = "feu-calme-cbb7";
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const params = new URLSearchParams(location.search);
-    const token = params.get("token") || "";
-    const root = document.getElementById("root");
-
-    function formatDateFR(iso) {
-      const [y, m, d] = iso.split("-");
-      return new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(new Date(+y, +m - 1, +d));
+<h1>Check-in Maison</h1>
+<p class="sub">Lecture seule</p>
+<div id="root" class="empty">Chargement…</div>
+<script>
+const SUPABASE_URL="https://itotjwvqhvdfmluzrjkd.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0b3Rqd3ZxaHZkZm1sdXpyamtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwNTUwNTYsImV4cCI6MjEwMjYzMTA1Nn0.qSO_uBExBpo3Yt93Ps6bAcdfrTZJpi56RSIgQrETEGw";
+const VALID="feu-calme-cbb7";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const params=new URLSearchParams(location.search);
+const token=params.get("token")||"";
+const root=document.getElementById("root");
+function formatDateFR(iso){
+  const[y,m,d]=iso.split("-");
+  return new Intl.DateTimeFormat("fr-FR",{weekday:"long",day:"numeric",month:"long"}).format(new Date(+y,+m-1,+d));
+}
+function esc(s){
+  return String(s||"").replace(/[&<>"']/g,m=>({"&":"&","<":"<",">":">","\"":""","'":"&#39;"}[m]));
+}
+async function run(){
+  try{
+    if(token && token!==VALID){
+      root.className="err";
+      root.textContent="Lien invalide ou expiré.";
+      return;
     }
-    function esc(s) {
-      return String(s || "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m]));
+    const {data,error}=await sb.from("maison_check_ins").select("*").order("created_at",{ascending:false}).limit(7);
+    if(error){
+      root.className="err";
+      root.textContent="Impossible de charger.";
+      console.error(error);
+      return;
     }
-
-    async function run() {
-      if (token !== VALID) {
-        root.className = "err";
-        root.textContent = "Lien invalide ou expiré.";
-        return;
-      }
-      const { data, error } = await sb.from("maison_check_ins")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(7);
-      if (error) {
-        root.className = "err";
-        root.textContent = "Impossible de charger.";
-        return;
-      }
-      if (!data?.length) {
-        root.className = "empty";
-        root.textContent = "Aucun check-in.";
-        return;
-      }
-      root.className = "";
-      root.innerHTML = data.map(c => `
-        <article class="card">
-          <div class="meta">
-            <span class="date">${formatDateFR(c.date)}</span>
-            <span class="sat">sat ${c.saturation}/10</span>
-          </div>
-          <div class="line"><strong>Corps</strong> · ${esc(c.body)}</div>
-          <div class="line"><strong>Mental</strong> · ${esc(c.mental)}</div>
-          <div class="line"><strong>Observation</strong> · ${esc(c.observation)}</div>
-          <div class="line"><strong>Désirs</strong> · ${esc(c.desires)}</div>
-          <div class="line"><strong>Besoin</strong> · ${esc(c.need)}</div>
-        </article>
-      `).join("");
+    if(!data||!data.length){
+      root.className="empty";
+      root.textContent="Aucun check-in.";
+      return;
     }
-    run();
-  </script>
+    root.className="";
+    root.innerHTML=data.map(c=>'<article class="card"><div class="meta"><span class="date">'+formatDateFR(c.date)+'</span><span class="sat">sat '+c.saturation+'/10</span></div><div class="line"><strong>Corps</strong> · '+esc(c.body)+'</div><div class="line"><strong>Mental</strong> · '+esc(c.mental)+'</div><div class="line"><strong>Observation</strong> · '+esc(c.observation)+'</div><div class="line"><strong>Désirs</strong> · '+esc(c.desires)+'</div><div class="line"><strong>Besoin</strong> · '+esc(c.need)+'</div></article>').join("");
+  }catch(e){
+    root.className="err";
+    root.textContent="Erreur: "+e.message;
+    console.error(e);
+  }
+}
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",run);
+}else{
+  run();
+}
+</script>
 </body>
 </html>
