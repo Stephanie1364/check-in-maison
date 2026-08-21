@@ -14,7 +14,7 @@ button,input,textarea{font:inherit;color:inherit;background:transparent;border:n
 .brand{font-family:var(--serif);font-size:1.15rem;color:var(--accent)}.brand span{display:block;font-size:.72rem;color:var(--dim);letter-spacing:.05em;text-transform:uppercase;margin-top:2px}
 .cadre{margin-top:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;font-size:.8rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px}
 .tag{padding:2px 8px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);font-size:.75rem;color:var(--text)}.tag.on{border-color:var(--accent-dim);color:var(--accent)}
-.nav{display:flex;gap:4px;margin-top:12px;overflow-x:auto}.nav button{flex:0 0 auto;padding:7px 12px;border-radius:999px;font-size:.78rem;color:var(--muted)}.nav button.active{color:var(--text);background:var(--bg3);border:1px solid var(--border)}
+.nav{display:flex;gap:4px;margin-top:12px;overflow-x:auto;-webkit-overflow-scrolling:touch}.nav button{flex:0 0 auto;padding:7px 12px;border-radius:999px;font-size:.78rem;color:var(--muted);-webkit-tap-highlight-color:transparent}.nav button.active{color:var(--text);background:var(--bg3);border:1px solid var(--border)}
 main{padding:16px}.panel{display:none}.panel.active{display:block}
 h2{font-family:var(--serif);font-size:1.05rem;font-weight:500;color:var(--accent);margin-bottom:12px}
 h3{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);margin:16px 0 8px}
@@ -67,7 +67,7 @@ details{background:var(--bg2);border:1px solid var(--border);border-radius:10px;
 <form id="form">
 <div class="field"><label>État corporel</label><input class="input" name="body" placeholder="Tension, fatigue…"/></div>
 <div class="field"><label>État mental / AuDHD</label><input class="input" name="mental" placeholder="Dispersion, surcharge…"/></div>
-<div class="field"><label>Saturation</label><div class="slider"><input type="range" name="saturation" min="1" max="10" value="5"/><span class="sat" id="satVal">5</span></div></div>
+<div class="field"><label>Saturation</label><div class="slider"><input type="range" name="saturation" min="1" max="10" value="5" oninput="document.getElementById('satVal').textContent=this.value"/><span class="sat" id="satVal">5</span></div></div>
 <div class="field"><label>Observation précise</label><textarea class="textarea" name="observation" placeholder="Un fait net"></textarea></div>
 <div class="field"><label>Désirs / frustrations</label>
 <div class="chips" id="desireChips">
@@ -132,6 +132,34 @@ details{background:var(--bg2);border:1px solid var(--border);border-radius:10px;
 </div></div></section>
 </main>
 <div class="toast" id="toast"></div>
-<script src="app.js?v=3"></script>
+<script>
+(function(){
+  function ready(fn){ if(document.readyState!=="loading") fn(); else document.addEventListener("DOMContentLoaded",fn); }
+  ready(function(){
+    var nav=document.getElementById("nav");
+    if(nav){
+      nav.addEventListener("click",function(e){
+        var b=e.target.closest("button[data-p]");
+        if(!b) return;
+        e.preventDefault();
+        nav.querySelectorAll("button").forEach(function(x){x.classList.remove("active");});
+        b.classList.add("active");
+        document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("active");});
+        var panel=document.getElementById("p-"+b.getAttribute("data-p"));
+        if(panel) panel.classList.add("active");
+      });
+    }
+    var sat=document.querySelector("input[name=saturation]");
+    var satVal=document.getElementById("satVal");
+    if(sat && satVal){
+      var sync=function(){ satVal.textContent=sat.value; };
+      sat.addEventListener("input",sync);
+      sat.addEventListener("change",sync);
+      sat.addEventListener("touchmove",sync);
+    }
+  });
+})();
+</script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
