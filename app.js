@@ -6,9 +6,7 @@ const $=function(s){return document.querySelector(s);};
 const $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s));};
 const todayISO=function(){return new Intl.DateTimeFormat("en-CA",{timeZone:"Europe/Paris",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());};
 const fmt=function(iso){if(!iso)return"";var p=iso.split("-");return new Intl.DateTimeFormat("fr-FR",{weekday:"long",day:"numeric",month:"long"}).format(new Date(+p[0],+p[1]-1,+p[2]));};
-const esc=function(s){
-  return String(s||"").replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""").replace(/'/g,"&#39;");
-};
+const esc=function(s){var d=document.createElement("div");d.textContent=String(s||"");return d.innerHTML;};
 function toast(m){var t=$("#toast");if(!t)return;t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2200);}
 
 function initNav(){
